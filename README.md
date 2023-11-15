@@ -40,10 +40,9 @@ print(synthetic_counterfactuals)
 
 ## Author
 - Original Algorithm: Mohammed Temraz and Mark T. Keane
-- Python Implementation: [Your Name]
+- Python Implementation: Dorian Joubaud
 
-## License
-[Specify the license under which this library is released, if applicable]
+
 
 ## Citation
 If you use this library in your research, please cite the original paper:
