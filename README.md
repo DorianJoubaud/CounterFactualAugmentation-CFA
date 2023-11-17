@@ -28,7 +28,7 @@ To use the CFA algorithm in your project, follow these steps:
 Example:
 ```python
 import numpy as np
-from cfa_algorithm import CFAAlgorithm
+from cfa import CFA
 
 # Example dataset
 X = np.array([[1, 2], [3, 4], [5, 6]])
