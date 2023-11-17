@@ -19,7 +19,8 @@ class CFA:
         :param X: Dataset features.
         :return: Array of tolerance levels for each feature.
         """
-        return self.tol * np.std(X, axis=0)
+        
+        return self.tol * np.std(X, axis=0) + np.mean(X, axis=0)
 
     def separate_classes(self, X, y):
         """
@@ -47,6 +48,24 @@ class CFA:
         :return: Indices of nearest neighbors in the majority class.
         """
         return neighbors_model.kneighbors(X, return_distance=False)[:, 0]
+    
+   
+    
+    def check_id_fd_accepted(self, instance, counterfactual, fd):
+        """
+        Check the number of feature that are considered as the same between an instance and its counterfactual. 
+        Two features are considered the same if they are within the tolerance level. Otherwise, they are considered not the same.
+        To be  accepted, the number of features considered the same must be superior or equal to the feature diff (fd)
+        
+        :param instance: The instance.
+        :param counterfactual: The counterfactual instance.
+        :param fd: The feature diff
+        :return: True if the feature dimensions are the same, False otherwise.
+        """
+       
+       
+        return np.sum(np.abs(instance - counterfactual) <= self.tol) >= fd
+      
 
     def generate_synthetic_instance(self, non_paired_majority, counterfactual, closest_paired_majority):
         """
@@ -72,38 +91,62 @@ class CFA:
         return paired_instances[idx[0][0]]
 
     def run_cfa(self, X, y):
-        """
-        Execute the CFA algorithm to generate synthetic instances.
-        
-        :param X: Feature matrix.
-        :param y: Target labels.
-        :return: List of synthetic instances.
-        """
         # Calculate the tolerance levels for feature adjustment
         tolerance = self.calculate_tolerance(X)
 
         # Separating the dataset into majority and minority classes
         majority_data, minority_data = self.separate_classes(X, y)
 
-        # Train a nearest neighbors model on the majority class
-        nn_model = NearestNeighbors(n_neighbors=1).fit(majority_data)
-
-        # Compute the CF-Set for minority class instances
-        cf_set_indices = self.compute_cf_set(minority_data, nn_model)
-
-        # Pair each minority instance with its nearest majority instance
-        paired_instances = [(majority_data[idx], minority_data[i]) for i, idx in enumerate(cf_set_indices)]
+        # Track paired and used majority instances
+        paired_majority_indices = list()
+        closest_majority_instance = list()
+        paired_minority_indices = list()
+        used_majority_indices = list()
 
         synthetic_instances = []
-        for np_maj in majority_data:
-            # Check if a majority instance is not already paired
-            if not any(np.array_equal(np_maj, maj) for maj, _ in paired_instances):
-                # Find the nearest paired majority instance
-                closest_paired_majority = self.find_nearest_paired(np_maj, [maj for maj, _ in paired_instances])
-                # Retrieve the paired minority instance
-                _, paired_minority = paired_instances[np.where(np.array([maj for maj, _ in paired_instances]) == closest_paired_majority)[0][0]]
-                # Generate and store the synthetic instance
-                synthetic_instance = self.generate_synthetic_instance(np_maj, paired_minority, closest_paired_majority)
-                synthetic_instances.append(synthetic_instance)
+        for i, minority_instance in enumerate(minority_data):
+            # Train nearest neighbors model for the minority instance
+            nn_model = NearestNeighbors(n_neighbors=len(majority_data)).fit(majority_data)
+            distances, indices = nn_model.kneighbors([minority_instance])
+            print('Pour data from minority class', minority_instance)
+
+            for idx in indices[0]:
+                if idx not in paired_majority_indices:
+                    # Found an unpaired closest majority instance
+                    closest_majority_instance.append(majority_data[idx])
+                    paired_majority_indices.append(idx)
+                    paired_minority_indices.append(i)
+                    break
+            print('Closest majority instance', closest_majority_instance)
+            
+            
+            
+       
+
+            # Generate and store the synthetic instance for each non-paired majority instance
+        nn_model = NearestNeighbors(n_neighbors=1).fit(closest_majority_instance)
+        for np_maj_idx, np_maj_instance in enumerate(majority_data):
+            if np_maj_idx not in paired_majority_indices and np_maj_idx not in used_majority_indices:
+                    
+                    
+                    distances, indices = nn_model.kneighbors([np_maj_instance])
+                    
+                    
+                    majority_instace_closest_to_npaired= majority_data[np.where((majority_data == closest_majority_instance[indices[0][0]]).all(axis=1))[0][0]]
+                    
+                    
+                    minority_data_closest_to_majority = minority_data[paired_minority_indices[np.where((closest_majority_instance == majority_instace_closest_to_npaired).all(axis=1))[0][0]]]
+                   
+                    # check if the number of feature that are considered as the same between an instance and its counterfactual is superior or equal to the feature diff (fd)
+                    
+                    if self.check_id_fd_accepted(minority_data_closest_to_majority, majority_instace_closest_to_npaired, self.fd):
+                       
+                        
+                        synthetic_instance = self.generate_synthetic_instance(np_maj_instance, minority_data_closest_to_majority, majority_instace_closest_to_npaired)
+                        synthetic_instances.append(synthetic_instance)
+                        used_majority_indices.append(np_maj_idx)
+                        
+                        
 
         return np.array(synthetic_instances)
+
