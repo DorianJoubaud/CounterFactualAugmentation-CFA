@@ -108,7 +108,7 @@ class CFA:
             # Train nearest neighbors model for the minority instance
             nn_model = NearestNeighbors(n_neighbors=len(majority_data)).fit(majority_data)
             distances, indices = nn_model.kneighbors([minority_instance])
-            print('Pour data from minority class', minority_instance)
+            
 
             for idx in indices[0]:
                 if idx not in paired_majority_indices:
@@ -117,7 +117,7 @@ class CFA:
                     paired_majority_indices.append(idx)
                     paired_minority_indices.append(i)
                     break
-            print('Closest majority instance', closest_majority_instance)
+            
             
             
             
