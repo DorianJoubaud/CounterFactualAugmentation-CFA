@@ -3,6 +3,8 @@
 ## Description
 This Python library implements the Counterfactual Data Augmentation (CFA) algorithm as described in the paper "Solving the Class Imbalance Problem Using a Counterfactual Method for Data Augmentation" by Mohammed Temraz and Mark T. Keane. The library provides an easy-to-use interface for generating synthetic counterfactual data to address class imbalance issues in machine learning datasets.
 
+![plot](./images/cfa.png)
+[ link to paper ](https://www.sciencedirect.com/science/article/pii/S2666827022000652)
 ## Features
 - **Class Separation**: Automatically distinguishes between majority and minority classes in a dataset.
 - **Counterfactual Pairing**: Creates pairs of data points from the majority and minority classes.
