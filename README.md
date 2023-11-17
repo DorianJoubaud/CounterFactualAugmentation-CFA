@@ -14,13 +14,13 @@ This Python library implements the Counterfactual Data Augmentation (CFA) algori
 - scikit-learn
 
 ## Installation
-Simply download the `cfa_algorithm.py` file to your project directory. Ensure that you have the required libraries (NumPy and scikit-learn) installed in your Python environment.
+Simply download the `cfa.py` file to your project directory. Ensure that you have the required libraries (NumPy and scikit-learn) installed in your Python environment.
 
 ## Usage
 To use the CFA algorithm in your project, follow these steps:
 
-1. Import the `CFAAlgorithm` class from `cfa_algorithm.py`.
-2. Create an instance of `CFAAlgorithm` with an optional `tolerance` parameter.
+1. Import the `CFA` class from `cfa.py`.
+2. Create an instance of `CFA` with an optional `tol` and `fd` parameters.
 3. Call the `run_cfa` method with your feature dataset `X` and class labels `y`.
 
 Example:
@@ -32,7 +32,7 @@ from cfa_algorithm import CFAAlgorithm
 X = np.array([[1, 2], [3, 4], [5, 6]])
 y = np.array([0, 0, 1])  # 0 for majority class, 1 for minority class
 
-cfa = CFAAlgorithm(tolerance=0.1)
+cfa = CFA(fd=3, tol=0.1)
 synthetic_counterfactuals = cfa.run_cfa(X, y)
 
 print(synthetic_counterfactuals)
