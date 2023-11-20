@@ -23,7 +23,7 @@ To use the CFA algorithm in your project, follow these steps:
 
 1. Import the `CFA` class from `cfa.py`.
 2. Create an instance of `CFA` with an optional `tol` and `fd` parameters.
-3. Call the `run_cfa` method with your feature dataset `X` and class labels `y`.
+3. Call the `run_cfa` method with your feature dataset `X`, class labels `y`and optional parameter `get_synt_label` to get synthetic label along with the data and the class label.
 
 Example:
 ```python
@@ -39,7 +39,7 @@ cfa = CFA(fd=2, tol=0.1)
 X_cfa, y_cfa = cfa.run_cfa(X, y, get_synt_labels=False)
 # OR
 # Get synthetic data and label (synthetic = {0;1})
-X_cfa, y_cfa, cfa_label = cfa.run_cfa(X, y, get_synt_labels=False)
+X_cfa, y_cfa, cfa_label = cfa.run_cfa(X, y, get_synt_labels=True)
 
 
 
