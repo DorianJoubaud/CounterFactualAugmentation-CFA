@@ -1,5 +1,6 @@
 import numpy as np
 from sklearn.neighbors import NearestNeighbors
+import pandas as pd
 
 class CFA:
     def __init__(self, fd, tol):
@@ -11,6 +12,8 @@ class CFA:
         """
         self.fd = fd
         self.tol = tol
+        self.mino_label = None
+        
 
     def calculate_tolerance(self, X):
         """
@@ -32,6 +35,7 @@ class CFA:
         """
        
         unique_classes, counts = np.unique(y, return_counts=True)
+        self.mino_label = unique_classes[np.argmin(counts)]
         majority_class_index = np.argmax(counts)
         majority_class = unique_classes[majority_class_index]
         majority_data = X[y == majority_class]
@@ -90,7 +94,7 @@ class CFA:
         _, idx = nn_model.kneighbors([instance])
         return paired_instances[idx[0][0]]
 
-    def run_cfa(self, X, y):
+    def run_cfa(self, X, y, get_synt_labels=False):
         # Calculate the tolerance levels for feature adjustment
         tolerance = self.calculate_tolerance(X)
 
@@ -147,6 +151,19 @@ class CFA:
                         used_majority_indices.append(np_maj_idx)
                         
                         
+        if get_synt_labels:
+            
+            df = pd.DataFrame(X)
+            df['Class'] = y
+            df_cfa = pd.DataFrame(synthetic_instances)
+            df_cfa['Class'] = 2
+            df_cfa['Synthetic'] = 1
+            df_cfa = pd.concat([df, df_cfa], ignore_index=True)
+            df_cfa['Synthetic'] = df_cfa['Synthetic'].fillna(0)
+            
 
-        return np.array(synthetic_instances)
+            return np.array(df_cfa.drop(columns=['Class']).drop(columns = ['Synthetic'])), np.array(df_cfa['Class']), np.array(df_cfa['Synthetic'])
 
+        else:
+            return np.concatenate((X, synthetic_instances)), np.concatenate((y, np.ones(len(synthetic_instances) * self.mino_label)))
+            
