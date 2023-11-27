@@ -156,7 +156,7 @@ class CFA:
             df = pd.DataFrame(X)
             df['Class'] = y
             df_cfa = pd.DataFrame(synthetic_instances)
-            df_cfa['Class'] = 2
+            df_cfa['Class'] = self.mino_label
             df_cfa['Synthetic'] = 1
             df_cfa = pd.concat([df, df_cfa], ignore_index=True)
             df_cfa['Synthetic'] = df_cfa['Synthetic'].fillna(0)
@@ -165,5 +165,5 @@ class CFA:
             return np.array(df_cfa.drop(columns=['Class']).drop(columns = ['Synthetic'])), np.array(df_cfa['Class']), np.array(df_cfa['Synthetic'])
 
         else:
-            return np.concatenate((X, synthetic_instances)), np.concatenate((y, np.ones(len(synthetic_instances) * self.mino_label)))
+            return np.concatenate((X, synthetic_instances)), np.concatenate((y, np.ones(np.array(synthetic_instances).shape[0])))
             
