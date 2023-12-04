@@ -149,9 +149,16 @@ class CFA:
                         synthetic_instance = self.generate_synthetic_instance(np_maj_instance, minority_data_closest_to_majority, majority_instace_closest_to_npaired)
                         synthetic_instances.append(synthetic_instance)
                         used_majority_indices.append(np_maj_idx)
-                        
+         
+         
+        # if no synthetic instance is generated, return the original dataset
+           
                         
         if get_synt_labels:
+            if len(synthetic_instances) == 0:
+                print('No synthetic instance generated')
+                print('Please try to increase the tolerance level or decrease the feature diff')
+                return X, y, np.zeros(X.shape[0])
             
             df = pd.DataFrame(X)
             df['Class'] = y
@@ -165,5 +172,12 @@ class CFA:
             return np.array(df_cfa.drop(columns=['Class']).drop(columns = ['Synthetic'])), np.array(df_cfa['Class']), np.array(df_cfa['Synthetic'])
 
         else:
+            if len(synthetic_instances) == 0:
+                print('No synthetic instance generated')
+                print('Please try to increase the tolerance level or decrease the feature diff')
+                
+                return X, y
+            
+            
             return np.concatenate((X, synthetic_instances)), np.concatenate((y, np.ones(np.array(synthetic_instances).shape[0])))
             
