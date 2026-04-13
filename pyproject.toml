@@ -1,0 +1,80 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "cfa"
+version = "0.2.0"
+description = "Counterfactual Data Augmentation for class imbalance (Temraz & Keane 2022)"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "MIT" }
+authors = [
+    { name = "Dorian Joubaud" },
+]
+keywords = [
+    "class-imbalance",
+    "data-augmentation",
+    "oversampling",
+    "counterfactual",
+    "XAI",
+]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "Topic :: Scientific/Engineering :: Artificial Intelligence",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "numpy>=1.20",
+    "scikit-learn>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7",
+    "ruff>=0.1",
+    "mypy>=1.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/DorianJoubaud/CounterFactualAugmentation-CFA"
+Paper = "https://www.sciencedirect.com/science/article/pii/S2666827022000652"
+Preprint = "https://arxiv.org/abs/2111.03516"
+
+[tool.hatch.build.targets.wheel]
+packages = ["cfa"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+    "E",   # pycodestyle errors
+    "F",   # pyflakes
+    "W",   # pycodestyle warnings
+    "N",   # pep8-naming
+    "UP",  # pyupgrade
+    "B",   # flake8-bugbear
+    "I",   # isort
+    "C4",  # flake8-comprehensions
+    "RUF", # ruff-specific
+]
+# N803 / N806 allow uppercase `X` (the conventional ML symbol for a feature matrix).
+ignore = ["N803", "N806"]
+
+[tool.mypy]
+python_version = "3.10"
+strict = false  # start lenient while the package settles
+ignore_missing_imports = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra -q"
